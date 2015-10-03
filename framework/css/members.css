@@ -1,0 +1,58 @@
+@import "admin.css";
+
+.notification-count {
+    font-size: 10px;
+    padding: 2px 4px;
+    border-radius: 8px;
+    margin-left: -10px;
+}
+
+body {
+    padding-top: 50px;
+}
+
+.no-border, .no-border:focus, .no-border:hover {
+    border: 0 solid transparent !important;
+}
+
+.no-background, .no-background:focus, .no-background:hover {
+    background: transparent !important;
+}
+
+.no-shadow, .no-shadow:focus, .no-shadow:hover {
+    box-shadow: none;
+    text-shadow: none;
+}
+
+ul.nav > li > input.search-field {
+    margin-top: 15px;
+    max-height: 22px;
+    padding-top: 5px;
+}
+
+@media (min-width: 767px) {
+    .navbar-top > div.container-fluid {
+        padding-left: 0;
+    }
+
+    nav.sidebar ul.nav {
+        font-size: 18px;
+        width: 100%
+    }
+
+    #sidebar li {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+}
+
+@media (max-width: 767px) {
+    nav.sidebar {
+        min-height: 0;
+    }
+}
+
+.label-fixed-height {
+    height: 20px;
+    overflow: hidden
+}
