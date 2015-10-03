@@ -1,0 +1,23 @@
+{
+  "name": "Minute framework",
+  "version": "v1.0.2",
+  "authors": [
+    "minutephp <dev@minutephp.com>"
+  ],
+  "description": "PHP and AngularJS framework",
+  "main": "framework/js/framework.js",
+  "keywords": [
+    "angularjs",
+    "php",
+    "frameowork"
+  ],
+  "license": "MIT",
+  "homepage": "http://www.minutephp.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
