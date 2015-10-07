@@ -647,6 +647,10 @@
                     authService.loginConfirmed();
                 });
 
+                $rootScope.import = function (init, data) {
+                    serviceInstance.import.call(this, this, init, data);
+                };
+
                 serviceInstance.setSelfURL('//' + location.host + location.pathname);
 
                 return serviceInstance;
@@ -665,4 +669,3 @@
 
     return m;
 }));
-
