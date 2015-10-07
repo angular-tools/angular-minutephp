@@ -570,3 +570,6 @@ div.image-result {
     }
 }
 
+.success.light, .table>tbody>tr.success.light>td {
+    background: #F6FCF4;
+}

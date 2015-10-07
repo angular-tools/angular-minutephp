@@ -1,7 +1,6 @@
 {
-  "name": "Minute framework",
-  "version": "v1.0.3",
-  "authors": [
+  "name": "angular-minutephp",
+    "authors": [
     "minutephp <dev@minutephp.com>"
   ],
   "description": "PHP and AngularJS framework",
