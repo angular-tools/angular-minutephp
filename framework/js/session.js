@@ -193,8 +193,6 @@
 
                 angular.element(document).find(clsHide).hide();
                 angular.element(document).find(clsShow).show();
-
-                console.log("show, hide: ", clsShow, clsHide);
             };
 
             serviceInstance.getUserID = function () {

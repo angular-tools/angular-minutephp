@@ -2,6 +2,8 @@
     <label class="{{form.labelHtmlClass}}" ng-class="{'sr-only': !showTitle()}" for="{{form.key.slice(-1)[0]}}">{{form.title}}</label>
 
     <div>
-        <div upload-button ng-model="$$value$$" title="{{form.title}}" preview="popup"></div>
+        <button type="button" upload-button ng-model="$$value$$" class="btn btn-default btn-sm" preview="true" accept="{{form.accept || 'image'}}" uploading="uploading" ng-disabled="uploading">
+            <i class="fa {{uploading && 'fa-refresh fa-spin' || 'fa-upload'}}"></i> {{uploading && 'Uploading..' || 'Upload new photo..'}}
+        </button>
     </div>
 </div>
