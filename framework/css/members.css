@@ -1,4 +1,4 @@
-@import "admin.css";
+@import url("admin.css");
 
 .notification-count {
     font-size: 10px;
