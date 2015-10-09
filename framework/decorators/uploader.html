@@ -1,0 +1,7 @@
+<div class="form-group {{form.htmlClass}}">
+    <label class="{{form.labelHtmlClass}}" ng-class="{'sr-only': !showTitle()}" for="{{form.key.slice(-1)[0]}}">{{form.title}}</label>
+
+    <div>
+        <div upload-button ng-model="$$value$$" title="{{form.title}}" preview="popup"></div>
+    </div>
+</div>
