@@ -89,7 +89,7 @@
 
             serviceInstance.socialLogin = function (provider) {
                 var url = hybridauthURL + provider;
-                window.open(url, "hybridauth_social_sing_on", "location=0,status=0,scrollbars=0,width=800,height=500");
+                window.open(url, "hybridauth_social_sing_on", "location=0,status=0,scrollbars=0,width=640,height=480"); //(/\=Facebook/.test(url) ?
             };
 
 
