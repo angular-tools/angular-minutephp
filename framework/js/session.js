@@ -44,6 +44,7 @@
             var signupPopupURL = host + '/_auth/signup_popup';
             var resetPwPopupURL = host + '/_auth/reset_password_popup';
             var forgotPwPopupURL = host + '/_auth/forgot_password_popup';
+            var completeSignupPopupURL = host + '/_auth/complete_signup_popup';
 
             var sessionLoadURL = host + '/_auth/get_session_data';
             var userDataURL = host + '/_auth/user_data';
@@ -52,6 +53,7 @@
             var loginURL = host + '/_auth/login';
             var logoutURL = host + '/_auth/logout';
             var registerURL = host + '/_auth/signup';
+            var completeSignupURL = host + '/_auth/signup_complete';
             var resetPasswordURL = host + '/_auth/reset-password';
             var forgotPasswordURL = host + '/_auth/forgot-password';
 
@@ -107,6 +109,17 @@
                     template: signupPopupURL,
                     closeByDocument: false,
                     data: {url: registerURL, updateSession: true},
+                    controller: ['$scope', popupController]
+                }));
+            };
+
+            var showCompleteSignupPopup = function (title, msg, cta) {
+                return $dialog.open(angular.extend(popupDefaults, {
+                    template: completeSignupPopupURL,
+                    showClose: false,
+                    closeByEscape: false,
+                    closeByDocument: false,
+                    data: {url: completeSignupURL, title: title, msg: msg, cta: cta, updateSession: true},
                     controller: ['$scope', popupController]
                 }));
             };
@@ -223,6 +236,23 @@
                 return promise;
             };
 
+            serviceInstance.checkRegistration = function (title, msg, cta) {
+                var deferred = $q.defer();
+
+                if (serviceInstance.hasOwnProperty('user') && serviceInstance.user.hasOwnProperty('email') && serviceInstance.user.email) {
+                    $timeout(deferred.resolve);
+                } else {
+                    serviceInstance.removeRegistrationWatch = $rootScope.$on('session_user_update', function (user) {
+                        deferred.resolve(serviceInstance['user']);
+                        serviceInstance.removeRegistrationWatch();
+                    });
+
+                    showCompleteSignupPopup(title, msg, cta);
+                }
+
+                return deferred.promise;
+            };
+
             serviceInstance.cookie = function (name, value, days) {
                 if (typeof(value) === 'undefined') {
                     var nameEQ = name + "=";
@@ -239,7 +269,7 @@
 
                     if (days > 0) {
                         var date = new Date();
-                        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                        date.setTime(date.getTime() + Math.round(days * 24 * 60 * 60 * 1000));
                         expires = "; expires=" + date.toGMTString();
                     } else if (days < 0) {
                         expires = "; expires=Thu, 01 Jan 1970 00:00:01 GMT";
@@ -287,6 +317,14 @@
                     return promise;
                 };
 
+                $scope.autoFocus = function (a) {
+                    var autofocus = $('input[data-auto-focus="true"]');
+
+                    if (autofocus.length > 0) {
+                        autofocus.get(0).focus();
+                    }
+                };
+
                 $scope.switchTemplate = function (name) {
                     $scope.closeThisDialog();
                     return name == 'signup' ? showSignupPopup() : name == 'login' ? showLoginPopup() : showForgotPasswordPopup();
@@ -296,13 +334,16 @@
                     $timeout(function () {
                         $scope.error = error;
                     });
-                }
+                };
+
+                $timeout($scope.autoFocus, 1000);
             };
 
             $window.sessionManager = serviceInstance;
             $timeout(serviceInstance.loadSession);
 
             $rootScope.$on('session_user_update', serviceInstance.showMemberLinks);
+
             serviceInstance.setSessionData({user: user, site: site, request: request, providers: providers});
 
             return serviceInstance;

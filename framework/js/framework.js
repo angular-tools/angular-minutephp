@@ -30,7 +30,7 @@
                 var serviceInstance = {};
 
                 serviceInstance.ModelArray = function () {
-                    var that = this;
+                    var that = Array.apply(null, arguments);
 
                     var parent = null;
                     var child = null;
@@ -46,32 +46,34 @@
                     var $more = false;
                     var $less = false;
 
-                    this.setParent = function (theParent) {
+                    that.isModelArray = true;
+
+                    that.setParent = function (theParent) {
                         parent = theParent;
                     };
 
-                    this.getParent = function () {
+                    that.getParent = function () {
                         return parent;
                     };
 
-                    this.setTotalItems = function (count) {
+                    that.setTotalItems = function (count) {
                         totalItems = parseInt(count);
                         this.updateTotalItems(0);
                     };
 
-                    this.updateTotalItems = function (delta) {
+                    that.updateTotalItems = function (delta) {
                         totalItems += delta;
                     };
 
-                    this.setItemsPerPage = function (theItemsPerPage) {
+                    that.setItemsPerPage = function (theItemsPerPage) {
                         itemsPerPage = theItemsPerPage;
                     };
 
-                    this.getItemsPerPage = function () {
+                    that.getItemsPerPage = function () {
                         return itemsPerPage > 0 ? itemsPerPage : 20;
                     };
 
-                    this.setOffset = function (theOffset) {
+                    that.setOffset = function (theOffset) {
                         offset = Math.min(theOffset, offset);
 
                         $timeout(function () {
@@ -84,39 +86,39 @@
                         });
                     };
 
-                    this.getOffset = function () {
+                    that.getOffset = function () {
                         return offset;
                     };
 
-                    this.getTotalItems = function () {
+                    that.getTotalItems = function () {
                         return totalItems;
                     };
 
-                    this.setChild = function (theChild) {
+                    that.setChild = function (theChild) {
                         child = theChild;
                     };
 
-                    this.getChild = function () {
+                    that.getChild = function () {
                         return child;
                     };
 
-                    this.setJoinKey = function (theJoinKey) {
+                    that.setJoinKey = function (theJoinKey) {
                         joinKey = theJoinKey;
                     };
 
-                    this.getJoinKey = function () {
+                    that.getJoinKey = function () {
                         return joinKey;
                     };
 
-                    this.setName = function (theName) {
+                    that.setName = function (theName) {
                         name = theName;
                     };
 
-                    this.getName = function () {
+                    that.getName = function () {
                         return name;
                     };
 
-                    this.createChild = function (data) {
+                    that.createChild = function (data) {
                         var newChild = new child;
 
                         if (data) {
@@ -129,7 +131,7 @@
                         return newChild;
                     };
 
-                    this.loadNextPage = function (replace) {
+                    that.loadNextPage = function (replace) {
                         if (maxPage < that.getTotalPages()) {
                             that.loadPage(maxPage + 1, replace);
                         } else {
@@ -137,23 +139,27 @@
                         }
                     };
 
-                    this.getTotalPages = function () {
+                    that.getTotalPages = function () {
                         return Math.max(0, -1 + (this.getTotalItems() / this.getItemsPerPage()));
                     };
 
-                    this.loadPage = function (page, replace) {
+                    that.loadPage = function (page, replace) {
                         var prefix_url = serviceInstance.getPrefixURL(that, 'read');
                         var read_url = prefix_url + this.getName() + '/' + page;
 
                         this.loadFromURL(read_url);
                     };
 
-                    this.loadFromURL = function (url, data, replace) {
+                    that.refresh = function () {
+                        this.loadPage(0);
+                    };
+
+                    that.loadFromURL = function (url, data, replace) {
                         var promise = $http.get(url, data || {});
                         promise.then(function (result) {
                             $timeout(function () {
                                 if (replace) {
-                                    that.length = 0;
+                                    that.splice(0, that.length);
                                 }
 
                                 serviceInstance.load(that, result.data[that.getName()]);
@@ -163,7 +169,7 @@
                         return promise;
                     };
 
-                    this.setAll = function (k, v) {
+                    that.setAll = function (k, v) {
                         angular.forEach(this, function (child, index) {
                             child.set(k, v);
                         });
@@ -171,7 +177,7 @@
                         return that;
                     };
 
-                    this.getAll = function (k) {
+                    that.getAll = function (k) {
                         var result = [];
                         angular.forEach(that, function (child, index) {
                             result.push(child.get(k));
@@ -180,15 +186,15 @@
                         return result;
                     };
 
-                    this.saveAll = function (onSuccess, onError) {
+                    that.saveAll = function (onSuccess, onError) {
                         return that._bulkOp('save', onSuccess, onError);
                     };
 
-                    this.removeAll = function (onSuccess, onError) {
+                    that.removeAll = function (onSuccess, onError) {
                         return that._bulkOp('remove', onSuccess, onError);
                     };
 
-                    this._bulkOp = function (op, onSuccess, onError) {
+                    that._bulkOp = function (op, onSuccess, onError) {
                         var promises = [], promise, deferred;
 
                         angular.forEach(that, function (child, index) {
@@ -210,18 +216,19 @@
                         return promise;
                     };
 
-                    this.more = function () {
+                    that.more = function () {
                         return $more;
                     };
 
-                    this.less = function () {
+                    that.less = function () {
                         return $less;
                     };
-                };
 
-                serviceInstance.ModelArray.prototype = [];
-                serviceInstance.ModelArray.prototype.create = function (data) {
-                    return this.createChild(data);
+                    that.create = function (data) {
+                        return that.createChild(data);
+                    };
+
+                    return that;
                 };
 
                 serviceInstance.Model = function () {
@@ -514,8 +521,6 @@
                     }
                 };
 
-                serviceInstance.Model.prototype = {};
-
                 serviceInstance.getPrefixURL = function (that, prefix) {
                     var prefixes = [];
                     var myParent = that;
@@ -557,7 +562,8 @@
                     if (angular.isArray(obj)) {
                         for (var i = 0; i < obj.length; i++) {
                             var val = obj[i];
-                            if (ref instanceof serviceInstance.ModelArray) {
+
+                            if (ref.hasOwnProperty('isModelArray') && ref.isModelArray) {
                                 if (val.hasOwnProperty('$metadata')) {
                                     delete(val['$metadata']);
 

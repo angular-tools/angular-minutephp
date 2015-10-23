@@ -206,7 +206,7 @@ button.btn-bottom-margin {
     margin: 0 0 10px 0;
     color: #333;
     border: 0;
-    border-bottom: 1px solid #666;
+    border-bottom: 1px solid #aaa;
 }
 
 h3.title {
@@ -396,6 +396,16 @@ div.jsoneditor textarea:first-child {
     font-size: 12px;
 }
 
+.text-big {
+    font-size: 25px;
+}
+
+.truncated {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .nav-tabs > li .close {
     margin: -10px -10px 0 20px;
     font-size: 18px;
@@ -537,6 +547,12 @@ div.image-result {
     background-position: center center;
     background-repeat: no-repeat;
     display: inline-block;
+}
+
+img.image-result {
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
 }
 
 .close-button {
