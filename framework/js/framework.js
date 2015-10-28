@@ -50,6 +50,7 @@
 
                     that.setParent = function (theParent) {
                         parent = theParent;
+                        console.log("theParent: ", theParent);
                     };
 
                     that.getParent = function () {
@@ -365,6 +366,7 @@
                         var isChild = !!myParent.getParent();
 
                         if (isChild) {
+                            console.log("child: ", true, myParent);
                             that.setParentPK();
                         }
 
@@ -592,7 +594,7 @@
                                     serviceInstance.load(ref[k], v);
                                 } else {
                                     if (typeof(ref[k]) !== 'undefined') {
-                                        angular.forEach(v, function (val, key) {
+                                        angular.forEach(v, function (val, key) { //port this code to recursion
                                             if (!angular.isObject(val)) {
                                                 ref[k][key] = serviceInstance.normalize(key, val);
                                             } else {
@@ -601,8 +603,10 @@
                                             }
                                         });
                                     } else {
-                                        console.log("ref: ", ref, k, v);
-                                        ref[k] = v;
+                                        ref[k] = {};
+                                        angular.forEach(v, function (val, key) {
+                                            ref[k][key] = serviceInstance.normalize(key, val);
+                                        });
                                     }
                                 }
                             } else {

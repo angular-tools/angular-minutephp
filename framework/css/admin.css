@@ -589,3 +589,15 @@ img.image-result {
 .success.light, .table>tbody>tr.success.light>td {
     background: #F6FCF4;
 }
+
+@media (min-width: 768px) {
+    .vr-sm-right {
+        border: 0;
+        border-right: 1px solid #eee;
+    }
+
+    .vr-sm-left {
+        border: 0;
+        border-left: 1px solid #eee;
+    }
+}
