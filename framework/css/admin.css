@@ -590,6 +590,18 @@ img.image-result {
     background: #F6FCF4;
 }
 
+div.filler {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+div.filler iframe {
+    background: #000;
+    border: none;
+    flex-grow: 1;
+}
+
 @media (min-width: 768px) {
     .vr-sm-right {
         border: 0;
@@ -601,3 +613,4 @@ img.image-result {
         border-left: 1px solid #eee;
     }
 }
+

@@ -19,7 +19,7 @@
     }]);
 
     m.provider('$minutephp', function () {
-        var defaults = this.defaults = {};
+        var defaults = this.defaults = {autoExtendChildScope: true};
 
         this.setDefaults = function (newDefaults) {
             angular.extend(defaults, newDefaults);
@@ -626,7 +626,7 @@
                     return obj;
                 };
 
-                serviceInstance.import = function (scope, init, data) {
+                serviceInstance.extend = function (scope, init, data) {
                     serviceInstance.init(init);
                     serviceInstance.load(scope, data);
                 };
@@ -657,9 +657,11 @@
                     authService.loginConfirmed();
                 });
 
-                $rootScope.import = function (init, data) {
-                    serviceInstance.import.call(this, this, init, data);
-                };
+                if (defaults.autoExtendChildScope === true) {
+                    $rootScope.extend = function (init, data) {
+                        serviceInstance.extend.call(this, this, init, data);
+                    };
+                }
 
                 serviceInstance.setSelfURL('//' + location.host + location.pathname);
 
