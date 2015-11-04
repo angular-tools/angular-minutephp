@@ -51,8 +51,3 @@ ul.nav > li > input.search-field {
         min-height: 0;
     }
 }
-
-.label-fixed-height {
-    height: 20px;
-    overflow: hidden
-}

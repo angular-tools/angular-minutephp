@@ -42,7 +42,7 @@
 
             var loginPopupURL = host + '/_auth/login_popup';
             var signupPopupURL = host + '/_auth/signup_popup';
-            var resetPwPopupURL = host + '/_auth/reset_password_popup';
+            var createPwPopupURL = host + '/_auth/create_password_popup';
             var forgotPwPopupURL = host + '/_auth/forgot_password_popup';
             var completeSignupPopupURL = host + '/_auth/complete_signup_popup';
 
@@ -54,7 +54,7 @@
             var logoutURL = host + '/_auth/logout';
             var registerURL = host + '/_auth/signup';
             var completeSignupURL = host + '/_auth/signup_complete';
-            var resetPasswordURL = host + '/_auth/reset-password';
+            var createPasswordURL = host + '/_auth/create-password';
             var forgotPasswordURL = host + '/_auth/forgot-password';
 
             var triggerEventURL = host + '/_auth/trigger_user_event';
@@ -85,8 +85,8 @@
                 return serviceInstance.loadSession().then(showForgotPasswordPopup);
             };
 
-            serviceInstance.resetPassword = function () {
-                return serviceInstance.loadSession().then(showResetPasswordPopup);
+            serviceInstance.createPassword = function () {
+                return serviceInstance.loadSession().then(showCreatePasswordPopup);
             };
 
             serviceInstance.socialLogin = function (provider) {
@@ -133,11 +133,11 @@
                 }));
             };
 
-            var showResetPasswordPopup = function () {
+            var showCreatePasswordPopup = function () {
                 return $dialog.open(angular.extend(popupDefaults, {
-                    template: resetPwPopupURL,
+                    template: createPwPopupURL,
                     closeByDocument: false,
-                    data: {url: resetPasswordURL},
+                    data: {url: createPasswordURL},
                     controller: ['$scope', popupController]
                 }));
             };

@@ -2,8 +2,17 @@
     <label class="{{form.labelHtmlClass}}" ng-class="{'sr-only': !showTitle()}" for="{{form.key.slice(-1)[0]}}">{{form.title}}</label>
 
     <div>
-        <button type="button" upload-button ng-model="$$value$$" class="btn btn-default btn-sm" preview="true" accept="{{form.accept || 'image'}}" uploading="uploading" ng-disabled="uploading">
-            <i class="fa {{uploading && 'fa-refresh fa-spin' || 'fa-upload'}}"></i> {{uploading && 'Uploading..' || 'Upload new photo..'}}
-        </button>
+        <div class="btn-group">
+            <button type="button" upload-button ng-model="$$value$$" class="btn btn-default btn-sm" preview="true" accept="{{form.accept || 'image'}}" uploading="uploading" ng-disabled="uploading"
+                    singular="true">
+                <i class="fa {{uploading && 'fa-refresh fa-spin' || 'fa-upload'}}"></i> {{uploading && 'Uploading..' || 'Upload new photo..'}}
+            </button>
+            <button class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="" upload-link ng-model="$$value$$" proxy="false">Upload via URL..</a></li>
+            </ul>
+        </div>
     </div>
 </div>
