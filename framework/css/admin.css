@@ -602,6 +602,10 @@ div.filler iframe {
     flex-grow: 1;
 }
 
+.full-width {
+    width: 100%;
+}
+
 @media (min-width: 768px) {
     .vr-sm-right {
         border: 0;
