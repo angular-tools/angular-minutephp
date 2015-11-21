@@ -1,15 +1,4 @@
-(function (root, factory) {
-    if (typeof module !== 'undefined' && module.exports) {
-        // CommonJS
-        module.exports = factory(require('angular'));
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD
-        define(['angular'], factory);
-    } else {
-        // Global Variables
-        factory(root.angular);
-    }
-}(this, function (angular, undefined) {
+(function () {
     'use strict';
 
     var m = angular.module('minutephp', ['session', 'notice', 'http-auth-interceptor']);
@@ -31,7 +20,6 @@
 
                 serviceInstance.ModelArray = function () {
                     var that = Array.apply(null, arguments);
-
                     var parent = null;
                     var child = null;
                     var joinKey = null;
@@ -680,4 +668,4 @@
     }]);
 
     return m;
-}));
+})();

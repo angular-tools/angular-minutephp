@@ -67,7 +67,7 @@
 
             serviceInstance.logout = function (redirectTo) {
                 $http.get(logoutURL).then(function () {
-                    serviceInstance.setSessionData({user: null});
+                    serviceInstance.setSessionData({user: null}, 'logout');
 
                     if (angular.isString(redirectTo)) {
                         top.location.href = redirectTo;
@@ -159,7 +159,7 @@
                 return deferred.promise;
             };
 
-            serviceInstance.setSessionData = function (data) {
+            serviceInstance.setSessionData = function (data, event) {
                 var allowed = ['user', 'site', 'request', 'providers'];
 
                 angular.forEach(data, function (v, k) {
@@ -167,7 +167,7 @@
                         serviceInstance[k] = v;
 
                         for (var i = 0; i < rootScopeArray.length; i++) {
-                            rootScopeArray[i].$broadcast("session_" + k + "_update", v);
+                            rootScopeArray[i].$broadcast("session_" + k + "_update", angular.extend({event: event}, v));
                         }
                     }
                 });
@@ -279,6 +279,8 @@
                 }
             };
 
+            var basename = function (url) { return url ? url.split('/').pop() : '';};
+
             var popupController = function ($scope) {
                 var data = $scope.ngDialogData;
 
@@ -298,7 +300,7 @@
                             promise.then(
                                 function (result) {
                                     if (data.updateSession) {
-                                        serviceInstance.setSessionData(result.data);
+                                        serviceInstance.setSessionData(result.data, basename(data.url));
                                     } else if (result.data && result.data.response) {
                                         $scope.success = result.data.response;
                                     }
