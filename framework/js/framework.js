@@ -38,7 +38,7 @@
 
                     that.setParent = function (theParent) {
                         parent = theParent;
-                        console.log("theParent: ", theParent);
+                        //console.log("theParent: ", theParent);
                     };
 
                     that.getParent = function () {
@@ -124,7 +124,7 @@
                         if (maxPage < that.getTotalPages()) {
                             that.loadPage(maxPage + 1, replace);
                         } else {
-                            console.log("already on last page: ", maxPage, that.getTotalPages());
+                            //console.log("already on last page: ", maxPage, that.getTotalPages());
                         }
                     };
 
@@ -326,7 +326,7 @@
                     this.post = function (cmd) {
                         var data = {cmd: cmd, model: that.getModel(), data: that.serialize()};
 
-                        console.log("POST URL: ", serviceInstance.getSelfURL(), "data: ", data);
+                        //console.log("POST URL: ", serviceInstance.getSelfURL(), "data: ", data);
                         return $http.post(serviceInstance.getSelfURL(), data);
                     };
 
@@ -354,7 +354,7 @@
                         var isChild = !!myParent.getParent();
 
                         if (isChild) {
-                            console.log("child: ", true, myParent);
+                            //console.log("child: ", true, myParent);
                             that.setParentPK();
                         }
 
@@ -362,7 +362,7 @@
                         var deferred = $q.defer();
 
                         promise.then(function (result) {
-                                console.log("pass: ", result, insert, oldPKValue);
+                                //console.log("pass: ", result, insert, oldPKValue);
                                 that.extend(result.data);
 
                                 if (insert) {
@@ -378,7 +378,7 @@
                                 deferred.resolve(that);
                             },
                             function (fail) {
-                                console.log("fail: ", fail);
+                                //console.log("fail: ", fail);
                                 return deferred.reject(fail);
                             }
                         );
@@ -470,10 +470,10 @@
                         var prefix_url = serviceInstance.getPrefixURL(that, 'refresh');
                         var refresh_url = prefix_url + this.getName() + '/' + that.get(that.getPK());
 
-                        console.log(refresh_url);
+                        //console.log(refresh_url);
                         $http.get(refresh_url, {}).then(function (result) {
                             $timeout(function () {
-                                console.log("refresh: ", result);
+                                //console.log("refresh: ", result);
                                 if (result && result.data && (typeof(result.data[that.getName()]) !== 'undefined') && (typeof(result.data[that.getName()][1]) !== 'undefined')) {
                                     serviceInstance.load(that, result.data[that.getName()][1]);
                                 }
