@@ -61,10 +61,6 @@
 
             var popupDefaults = {className: 'ngdialog-theme-plain'};
 
-            serviceInstance.login = function () {
-                return serviceInstance.loadSession().then(showLoginPopup);
-            };
-
             serviceInstance.logout = function (redirectTo) {
                 $http.get(logoutURL).then(function () {
                     serviceInstance.setSessionData({user: null}, 'logout');
@@ -77,16 +73,20 @@
                 });
             };
 
-            serviceInstance.signup = function () {
-                return serviceInstance.loadSession().then(showSignupPopup);
+            serviceInstance.login = function (msg) {
+                return serviceInstance.loadSession().then(function () {showLoginPopup(msg);});
             };
 
-            serviceInstance.forgotPassword = function () {
-                return serviceInstance.loadSession().then(showForgotPasswordPopup);
+            serviceInstance.signup = function (msg) {
+                return serviceInstance.loadSession().then(function () {showSignupPopup(msg);});
             };
 
-            serviceInstance.createPassword = function () {
-                return serviceInstance.loadSession().then(showCreatePasswordPopup);
+            serviceInstance.forgotPassword = function (msg) {
+                return serviceInstance.loadSession().then(function () {showForgotPasswordPopup(msg);});
+            };
+
+            serviceInstance.createPassword = function (msg) {
+                return serviceInstance.loadSession().then(function () {showCreatePasswordPopup(msg);});
             };
 
             serviceInstance.socialLogin = function (provider) {
@@ -95,20 +95,20 @@
             };
 
 
-            var showLoginPopup = function () {
+            var showLoginPopup = function (msg) {
                 return $dialog.open(angular.extend(popupDefaults, {
                     template: loginPopupURL,
                     closeByDocument: false,
-                    data: {url: loginURL, updateSession: true},
+                    data: {url: loginURL, updateSession: true, msg: msg},
                     controller: ['$scope', popupController]
                 }));
             };
 
-            var showSignupPopup = function () {
+            var showSignupPopup = function (msg) {
                 return $dialog.open(angular.extend(popupDefaults, {
                     template: signupPopupURL,
                     closeByDocument: false,
-                    data: {url: registerURL, updateSession: true},
+                    data: {url: registerURL, updateSession: true, msg: msg},
                     controller: ['$scope', popupController]
                 }));
             };
@@ -124,20 +124,20 @@
                 }));
             };
 
-            var showForgotPasswordPopup = function () {
+            var showForgotPasswordPopup = function (msg) {
                 return $dialog.open(angular.extend(popupDefaults, {
                     template: forgotPwPopupURL,
                     closeByDocument: false,
-                    data: {url: forgotPasswordURL},
+                    data: {url: forgotPasswordURL, msg: msg},
                     controller: ['$scope', popupController]
                 }));
             };
 
-            var showCreatePasswordPopup = function () {
+            var showCreatePasswordPopup = function (msg) {
                 return $dialog.open(angular.extend(popupDefaults, {
                     template: createPwPopupURL,
                     closeByDocument: false,
-                    data: {url: createPasswordURL},
+                    data: {url: createPasswordURL, msg: msg},
                     controller: ['$scope', popupController]
                 }));
             };
@@ -283,6 +283,7 @@
 
             var popupController = function ($scope) {
                 var data = $scope.ngDialogData;
+                //console.log("data: ", data);
 
                 $scope.providers = serviceInstance.providers;
                 $scope.socialLogin = serviceInstance.socialLogin;

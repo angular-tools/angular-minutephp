@@ -306,7 +306,7 @@ tr.text-links td:hover {
 }
 
 .margin-bottom {
-    margin-bottom: 20px;
+    margin-bottom: 20px !important;
 }
 
 div.full-page {
@@ -604,6 +604,10 @@ div.filler iframe {
 
 .full-width {
     width: 100%;
+}
+
+.inline-row {
+    margin-left: -15px !important;
 }
 
 @media (min-width: 768px) {
