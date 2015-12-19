@@ -74,19 +74,19 @@
             };
 
             serviceInstance.login = function (msg) {
-                return serviceInstance.loadSession().then(function () {showLoginPopup(msg);});
+                return serviceInstance.loadSession().then(function () {return showLoginPopup(msg);});
             };
 
             serviceInstance.signup = function (msg) {
-                return serviceInstance.loadSession().then(function () {showSignupPopup(msg);});
+                return serviceInstance.loadSession().then(function () {return showSignupPopup(msg);});
             };
 
             serviceInstance.forgotPassword = function (msg) {
-                return serviceInstance.loadSession().then(function () {showForgotPasswordPopup(msg);});
+                return serviceInstance.loadSession().then(function () {return showForgotPasswordPopup(msg);});
             };
 
             serviceInstance.createPassword = function (msg) {
-                return serviceInstance.loadSession().then(function () {showCreatePasswordPopup(msg);});
+                return serviceInstance.loadSession().then(function () {return showCreatePasswordPopup(msg);});
             };
 
             serviceInstance.socialLogin = function (provider) {
