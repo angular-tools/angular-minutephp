@@ -34,8 +34,6 @@
                     var $more = false;
                     var $less = false;
 
-                    that.isModelArray = true;
-
                     that.setParent = function (theParent) {
                         parent = theParent;
                         //console.log("theParent: ", theParent);
@@ -105,6 +103,15 @@
 
                     that.getName = function () {
                         return name;
+                    };
+
+                    that.setProps = function (props) {
+                        angular.forEach(props, function (v, k) {
+                            var name = 'set' + (k.charAt(1).toUpperCase() + k.slice(2));
+                            if (that.hasOwnProperty(name)) {
+                                that[name](v);
+                            }
+                        });
                     };
 
                     that.createChild = function (data) {
@@ -277,6 +284,7 @@
                                         that.set(joinKey, parentID);
                                     } else {
                                         var pName = parent.getParent().getName();
+                                        //console.log("parent: ", parent.getParent());
                                         throw new Error('"' + pName + '" (parent) does not have a primary key. To create children, please call $scope.' + pName + '.save() first');
                                     }
                                 }
@@ -545,62 +553,34 @@
                 };
 
                 serviceInstance.init = function (f) {
-                    f();
+                    if (typeof f == 'function') {
+                        f();
+                    }
                 };
 
-                serviceInstance.load = function (ref, obj) {
-                    if (angular.isArray(obj)) {
-                        for (var i = 0; i < obj.length; i++) {
-                            var val = obj[i];
+                serviceInstance.load = function (parent, child) {
+                    if (angular.isArray(child)) { //array with $metadata
+                        if (parent.hasOwnProperty('setProps') && child.length > 0) {
+                            var setters = child[0].$metadata ? child.shift() : {};
+                            parent.setProps(setters);
 
-                            if (ref.hasOwnProperty('isModelArray') && ref.isModelArray) {
-                                if (val.hasOwnProperty('$metadata')) {
-                                    delete(val['$metadata']);
-
-                                    angular.forEach(val, function (v, k) {
-                                        var name = k.charAt(1).toUpperCase() + k.slice(2);
-                                        ref['set' + name](v);
-                                    });
-                                } else {
-                                    var child = ref.createChild();
-                                    //child.setParent(ref);
-                                    //ref.push(child);
-                                    serviceInstance.load(child, val);
-                                }
-                            } else {
-                                if (!val.hasOwnProperty('$metadata')) {
-                                    ref.push(val);
-                                }
-                            }
+                            angular.forEach(child, function (item) {
+                                var itemHolder = parent.create();
+                                serviceInstance.load(itemHolder, item);
+                            });
                         }
-                    } else if (angular.isObject(obj)) {
-                        angular.forEach(obj, function (v, k) {
-                            if (angular.isObject(v)) {
-                                var modelArr = k + "Array";
-                                if (typeof(serviceInstance[modelArr]) !== 'undefined') {
-                                    ref[k] = new serviceInstance[modelArr](ref instanceof serviceInstance.Model ? ref : null);
-                                    serviceInstance.load(ref[k], v);
-                                } else {
-                                    if (typeof(ref[k]) !== 'undefined') {
-                                        angular.forEach(v, function (val, key) { //port this code to recursion
-                                            if (!angular.isObject(val)) {
-                                                ref[k][key] = serviceInstance.normalize(key, val);
-                                            } else {
-                                                ref[k][key] = angular.isArray(val) ? [] : {};
-                                                serviceInstance.load(ref[k][key], val);
-                                            }
-                                        });
-                                    } else {
-                                        ref[k] = {};
-                                        angular.forEach(v, function (val, key) {
-                                            ref[k][key] = serviceInstance.normalize(key, val);
-                                        });
-                                    }
-                                }
+                    } else if (angular.isObject(child)) {
+                        angular.forEach(child, function (v, k) {
+                            if (angular.isArray(v) || angular.isObject(v)) {
+                                var obj = serviceInstance[angular.isArray(v) ? k + "Array" : k + "Item"];
+                                parent[k] = obj ? new obj(parent) : {};
+                                serviceInstance.load(parent[k], v);
                             } else {
-                                ref[k] = serviceInstance.normalize(k, v);
+                                parent[k] = serviceInstance.normalize(k, v);
                             }
                         });
+                    } else {
+                        //console.log("unknown parent, child: ", parent, child);
                     }
                 };
 
@@ -615,8 +595,20 @@
                 };
 
                 serviceInstance.extend = function (scope, init, data) {
-                    serviceInstance.init(init);
-                    serviceInstance.load(scope, data);
+                    if (scope) {
+                        if (init) {
+                            serviceInstance.init(init);
+                        }
+
+                        if (data) {
+                            angular.forEach(data, function (value, key) {
+                                var obj = serviceInstance[angular.isArray(value) ? key + "Array" : key + "Item"];
+                                scope[key] = obj ? new obj(null) : {};
+                                //debugger;
+                                serviceInstance.load(scope[key], value);
+                            });
+                        }
+                    }
                 };
 
                 serviceInstance.toMySQLDate = function (dateobj) {
@@ -647,7 +639,7 @@
 
                 if (defaults.autoExtendChildScope === true) {
                     $rootScope.extend = function (init, data) {
-                        serviceInstance.extend.call(this, this, init, data);
+                        serviceInstance.extend.call(this, this, init, data || {});
                     };
                 }
 
