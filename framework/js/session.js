@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var m = angular.module('session', ['ngDialog', 'angular-loading-bar', 'angularFloatingLabels']);
+    var m = angular.module('session', ['ngDialog', 'angular-loading-bar']);
     var loaded = false;
     var rootScopeArray = [];
     var serviceInstance = null;
