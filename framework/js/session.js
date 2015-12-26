@@ -48,6 +48,7 @@
 
             var sessionLoadURL = host + '/_auth/get_session_data';
             var userDataURL = host + '/_auth/user_data';
+            var userTzUpdateURL = host + '/_auth/set_user_info';
 
             var hybridauthURL = host + '/_auth/hybridauth?provider=';
             var loginURL = host + '/_auth/login';
@@ -199,17 +200,23 @@
                 return $http.post(triggerEventURL, {eventName: eventName, eventData: eventData});
             };
 
-            serviceInstance.showMemberLinks = function () {
-                var show = serviceInstance.getUserID();
+            serviceInstance.onSessionStart = function () {
+                var user = serviceInstance.getUser();
+                var show = user && user.user_id > 0;
                 var clsShow = show > 0 ? '.visible-members' : '.visible-non-members';
                 var clsHide = !(show > 0) ? '.visible-members' : '.visible-non-members';
 
                 angular.element(document).find(clsHide).hide();
                 angular.element(document).find(clsShow).show();
+
+                if (user && (user.tz_offset === null) || (user.ip_addr === null)) {
+                    user.tz_offset = (new Date()).getTimezoneOffset();
+                    $http.post(userTzUpdateURL, {tz: user.tz_offset});
+                }
             };
 
-            serviceInstance.getUserID = function () {
-                return (angular.isObject(serviceInstance['user']) && (serviceInstance['user']['user_id'] > 0)) ? serviceInstance['user']['user_id'] : false;
+            serviceInstance.getUser = function () {
+                return (angular.isObject(serviceInstance['user']) && (serviceInstance['user']['user_id'] > 0)) ? serviceInstance['user'] : null;
             };
 
             serviceInstance.getUserData = function (key) {
@@ -345,7 +352,7 @@
             $window.sessionManager = serviceInstance;
             $timeout(serviceInstance.loadSession);
 
-            $rootScope.$on('session_user_update', serviceInstance.showMemberLinks);
+            $rootScope.$on('session_user_update', serviceInstance.onSessionStart);
 
             serviceInstance.setSessionData({user: user, site: site, request: request, providers: providers});
 

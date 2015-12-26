@@ -543,8 +543,10 @@
                 serviceInstance.normalize = function (k, v) {
                     var dateMatch;
 
-                    if (/\_at$/.test(k) && angular.isString(v) && (dateMatch = v.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/))) { //ignore timezone
-                        return new Date(Date.parse(dateMatch[0]));
+                    if (/\_at$/.test(k) && angular.isString(v) && (dateMatch = v.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/))) { //valid dates only!
+                        var date = new Date(Date.parse(v));
+                        //console.log("k, v, d: ", k, v, date);
+                        return date;
                     } else if (/\_json$/.test(k) && angular.isString(v)) {
                         return angular.fromJson(v);
                     }
