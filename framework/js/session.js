@@ -209,7 +209,7 @@
                 angular.element(document).find(clsHide).hide();
                 angular.element(document).find(clsShow).show();
 
-                if (user && (user.tz_offset === null) || (user.ip_addr === null)) {
+                if (user && user.user_id > 0 && ((user.tz_offset === null) || (user.ip_addr === null))) {
                     user.tz_offset = (new Date()).getTimezoneOffset();
                     $http.post(userTzUpdateURL, {tz: user.tz_offset});
                 }
