@@ -143,11 +143,12 @@
                         var prefix_url = serviceInstance.getPrefixURL(that, 'read');
                         var read_url = prefix_url + this.getName() + '/' + page;
 
-                        this.loadFromURL(read_url);
+                        return this.loadFromURL(read_url);
                     };
 
                     that.refresh = function () {
-                        this.loadPage(0);
+                        this.splice(0, this.length);
+                        return this.loadPage(0);
                     };
 
                     that.loadFromURL = function (url, data, replace) {
