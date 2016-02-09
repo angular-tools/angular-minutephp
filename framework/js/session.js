@@ -148,7 +148,7 @@
 
                 if (!loaded) {
                     loaded = true;
-
+return;
                     $http.get(sessionLoadURL).then(function (result) {
                         serviceInstance.setSessionData(result.data);
                         deferred.resolve();
