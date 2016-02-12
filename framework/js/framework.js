@@ -34,8 +34,15 @@
                         var $more = false;
                         var $less = false;
 
+                        var limit = null;
+
+                        var orderBy = null;
+                        var defaultOrderBy = null;
+
                         var searchCriteria = null;
-                        var searchMode = 'NORMAL'; //NORMAL|LIKE|NATURAL LANGUAGE MODE
+                        var searchMode = 'NORMAL'; //NORMAL|LIKE|IN NATURAL LANGUAGE MODE
+
+                        var cache = {};
 
                         that.setParent = function (theParent) {
                             parent = theParent;
@@ -63,11 +70,15 @@
                             return itemsPerPage > 0 ? itemsPerPage : 20;
                         };
 
+                        that.getCurrentPage = function () {
+                            return 1 + Math.floor(that.getOffset() / (that.getItemsPerPage() || 1));
+                        };
+
                         that.setOffset = function (theOffset) {
                             offset = Math.min(theOffset, offset);
 
                             $timeout(function () {
-                                var page = Math.floor(theOffset / that.getItemsPerPage());
+                                var page = Math.floor(theOffset / (that.getItemsPerPage() || 1));
                                 maxPage = Math.max(maxPage, page);
                                 minPage = Math.min(minPage, page);
 
@@ -127,6 +138,8 @@
                             newChild.setParent(that);
                             that.push(newChild);
 
+                            $rootScope.$broadcast("item_added", {self: that, child: newChild});
+
                             return newChild;
                         };
 
@@ -139,11 +152,11 @@
                         };
 
                         that.setSearchMode = function (mode) {
-                            if (searchCriteria && (mode != searchMode)) {
-                                $timeout(that.refresh);
-                            }
-
                             searchMode = mode;
+                        };
+
+                        that.getSearchMode = function () {
+                            return mode;
                         };
 
                         that.setSearchCriteria = function (criteria) {
@@ -154,44 +167,91 @@
                             searchCriteria = criteria;
                         };
 
-                        that.getTotalPages = function () {
-                            return Math.max(0, -1 + (that.getTotalItems() / that.getItemsPerPage()));
+                        that.getSearchCriteria = function () {
+                            return searchCriteria;
                         };
 
-                        that.loadPage = function (page, replace) {
-                            var prefix_url = serviceInstance.getPrefixURL(that, 'read');
-                            var read_url = prefix_url + that.getName() + '/' + page;
+                        that.setDefaultOrderBy = function (criteria) {
+                            orderBy = criteria;
+                        };
 
-                            return that.loadFromURL(read_url);
+                        that.setOrderBy = function (criteria) {
+                            if (criteria != orderBy) {
+                                $timeout(that.refresh);
+                            }
+
+                            orderBy = criteria;
+                        };
+
+                        that.getOrderBy = function () {
+                            return orderBy;
+                        };
+
+                        that.setLimit = function (num) {
+                            if (num != limit) {
+                                $timeout(that.refresh);
+                            }
+
+                            limit = num;
+                        };
+
+                        that.getLimit = function () {
+                            return limit;
+                        };
+
+                        that.getTotalPages = function () {
+                            return Math.ceil(Math.max(0, -1 + (that.getTotalItems() / (that.getItemsPerPage() || 1))));
+                        };
+
+                        that.loadPage = function (page, replace, cached) {
+                            if (page >= 0) {
+                                var prefix_url = serviceInstance.getPrefixURL(that, 'read');
+                                var read_url = prefix_url + that.getName() + '/' + page;
+
+                                return that.loadFromURL(read_url, null, replace, cached);
+                            }
                         };
 
                         that.refresh = function () {
-                            maxPage = 0;
-                            that.splice(0, that.length);
-                            return that.loadPage(0);
+                            //that.splice(0, that.length);
+                            return that.loadPage(0, true);
                         };
 
-                        that.loadFromURL = function (url, data, replace) {
+                        that.loadFromURL = function (url, data, replace, cached) {
                             var query = typeof(searchCriteria) == 'string' ? {'*': searchCriteria} : searchCriteria;
                             var search = searchCriteria ? {_search: angular.extend({_model: that.getName(), _mode: searchMode, _params: query})} : null;
-                            var params = angular.extend({}, data, search);
-                            var promise = $http.get(url, {params: params});
+                            var order = orderBy ? {_order: {_orderBy: orderBy, _model: that.getName()}} : null;
+                            var limits = limit > 0 ? {_limit: {_limit: limit, _model: that.getName()}} : null;
+                            var params = angular.extend({}, data, search, order, limits);
+                            var key = cached ? angular.toJson({url: url, params: params}) : null;
+                            var promise;
 
-                            //console.log("params: ", params);
+                            if (key && cache[key]) {
+                                var deferred = $q.defer();
+                                promise = deferred.promise;
+                                $timeout(function () { deferred.resolve(cache[key]);});
+                            } else {
+                                promise = $http.get(url, {params: params});
+                            }
 
                             promise.then(function (result) {
                                 $timeout(function () {
                                     if (replace) {
+                                        maxPage = 0;
                                         that.splice(0, that.length);
                                     }
 
+                                    if (key) {
+                                        cache[key] = result;
+                                    }
+
+                                    $rootScope.$broadcast("items_loaded", {self: that});
                                     serviceInstance.load(that, result.data[that.getName()]);
                                 });
                             });
 
                             return promise;
-                        }
-                        ;
+                        };
 
                         that.setAll = function (k, v) {
                             angular.forEach(this, function (child, index) {
@@ -400,6 +460,7 @@
                             promise.then(function (result) {
                                     //console.log("pass: ", result, insert, oldPKValue);
                                     that.extend(result.data);
+                                    $rootScope.$broadcast("item_save", {self: that, result: result});
 
                                     if (insert) {
                                         that.getParent().updateTotalItems(+1);
@@ -437,6 +498,7 @@
                                 promise = that.post('remove');
                                 promise.then(function (result) {
                                         that.getParent().updateTotalItems(-1);
+                                        $rootScope.$broadcast("item_removed", {self: that, parent: parent});
 
                                         return $q.when(result);
                                     },
@@ -511,6 +573,7 @@
                                 $timeout(function () {
                                     //console.log("refresh: ", result);
                                     if (result && result.data && (typeof(result.data[that.getName()]) !== 'undefined') && (typeof(result.data[that.getName()][1]) !== 'undefined')) {
+                                        $rootScope.$broadcast("items_reloaded", {self: that});
                                         serviceInstance.load(that, result.data[that.getName()][1]);
                                     }
                                 });

@@ -586,7 +586,7 @@ img.image-result {
     }
 }
 
-.success.light, .table>tbody>tr.success.light>td {
+.success.light, .table > tbody > tr.success.light > td {
     background: #F6FCF4;
 }
 
@@ -641,4 +641,32 @@ h3.simple-title {
     padding: 0;
     font-size: 22px;
     line-height: 42px;
+}
+
+div.searchbar h3 {
+    margin-top: 5px;
+    margin-bottom: 30px;
+}
+
+div.angular-pager ul {
+}
+
+div.angular-pager li > a {
+    color: #666;
+    border: 0;
+    line-height: 32px;
+}
+
+div.angular-pager div.numitems {
+    margin-top: 20px;
+}
+
+div.angular-pager .simple {
+    display: inline;
+    width: inherit;
+    margin: 0 10px;
+}
+
+div.angular-pager .disabled a, div.angular-pager .disabled a:focus {
+    color: #ccc;
 }
