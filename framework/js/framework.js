@@ -28,6 +28,7 @@
                         var minPage = 0;
                         var totalItems = 0;
                         var itemsPerPage = 0;
+                        var model = '';
                         var name = 'ModelArray';
                         var offset = 9999;
 
@@ -119,6 +120,14 @@
                             return name;
                         };
 
+                        that.setModel = function (theModel) {
+                            model = theModel;
+                        };
+
+                        that.getModel = function () {
+                            return model;
+                        };
+
                         that.setProps = function (props) {
                             angular.forEach(props, function (v, k) {
                                 var name = 'set' + (k.charAt(1).toUpperCase() + k.slice(2));
@@ -172,7 +181,7 @@
                         };
 
                         that.setDefaultOrderBy = function (criteria) {
-                            orderBy = criteria;
+                            orderBy = defaultOrderBy = criteria;
                         };
 
                         that.setOrderBy = function (criteria) {
@@ -219,12 +228,14 @@
 
                         that.loadFromURL = function (url, data, replace, cached) {
                             var query = typeof(searchCriteria) == 'string' ? {'*': searchCriteria} : searchCriteria;
-                            var search = searchCriteria ? {_search: angular.extend({_model: that.getName(), _mode: searchMode, _params: query})} : null;
-                            var order = orderBy ? {_order: {_orderBy: orderBy, _model: that.getName()}} : null;
-                            var limits = limit > 0 ? {_limit: {_limit: limit, _model: that.getName()}} : null;
+                            var search = searchCriteria ? {_search: angular.extend({_model: that.getModel(), _mode: searchMode, _params: query})} : null;
+                            var order = orderBy && (orderBy != defaultOrderBy) ? {_order: {_orderBy: orderBy, _model: that.getModel()}} : null;
+                            var limits = limit > 0 ? {_limit: {_limit: limit, _model: that.getModel()}} : null;
                             var params = angular.extend({}, data, search, order, limits);
                             var key = cached ? angular.toJson({url: url, params: params}) : null;
                             var promise;
+
+                            //console.log("params: ", params);
 
                             if (key && cache[key]) {
                                 var deferred = $q.defer();
