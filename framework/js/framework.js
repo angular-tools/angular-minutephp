@@ -569,10 +569,13 @@
                         };
 
                         that.removeConfirm = function (confirmMsg, onSuccess, onError) {
-                            return $notice.confirm(confirmMsg || 'Are you sure?').then(function () {
-                                    that.remove(onSuccess, onError);
-                                }
-                            );
+                            var deferred = $q.defer();
+
+                            $notice.confirm(confirmMsg || 'Are you sure?').then(function () {
+                                that.remove(onSuccess, onError).then(deferred.resolve, deferred.reject);
+                            }, deferred.reject);
+
+                            return deferred.promise;
                         };
 
                         that.refresh = function () {
@@ -708,7 +711,7 @@
                                 angular.forEach(data, function (value, key) {
                                     var obj = serviceInstance[angular.isArray(value) ? key + "Array" : key + "Item"];
                                     scope[key] = obj ? new obj(null) : {};
-                                    //debugger;
+
                                     serviceInstance.load(scope[key], value);
                                 });
                             }
